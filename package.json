@@ -1,23 +1,25 @@
 {
   "name": "cv2-hyperscroll",
   "author": "Sean Morris,",
-  "version": "0.0.0",
+  "version": "0.0.0-a",
   "description": "Hyperscroll views for curvature.",
   "dependencies": {
-  	"curvature": "^0.0.66"
+    "curvature": "^0.0.66-n"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.14",
     "@babel/core": "^7.13.14",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.13.12",
-    "babel-minify": "^0.5.1"
+    "babel-minify": "^0.5.1",
+    "babel-plugin-macros": "^3.1.0",
+    "rawquire": "^0.0.0"
   },
   "files": [
-		"dist/cv2-hyperscroll.min.js",
-		"dist/cv2-hyperscroll.js",
-		"HyperScroller.js",
-		"RecordSet.js",
-		"Row.js"
-	]
+    "dist/cv2-hyperscroll.min.js",
+    "dist/cv2-hyperscroll.js",
+    "HyperScroller.js",
+    "RecordSet.js",
+    "Row.js"
+  ]
 }

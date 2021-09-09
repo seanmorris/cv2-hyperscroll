@@ -1,5 +1,6 @@
-import { View as BaseView } from 'curvature/base/View';
+import { rawquire } from 'rawquire/rawquire.macro';
 
+import { View as BaseView } from 'curvature/base/View';
 import { Mixin } from 'curvature/base/Mixin';
 
 import { Tag } from 'curvature/base/Tag';
@@ -16,12 +17,12 @@ export class HyperScroller extends Mixin.from(BaseView)
 	{
 		super(args, parent);
 
-		this.template = require('./hyper-scroller');
+		this.template = rawquire('./hyper-scroller.html');
 
 		this.preRuleSet.add('[cv-ref="list"]', ({element}) => {
 			element.setAttribute('tabindex', -1);
 			element.setAttribute('cv-each', 'visible:row:r');
-			element.setAttribute('cv-view', './Row');
+			element.setAttribute('cv-view', 'cv2-hyperscroll/Row');
 		});
 
 		this.args.visible   = [];

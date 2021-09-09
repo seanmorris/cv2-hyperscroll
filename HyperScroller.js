@@ -54,13 +54,13 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
     _classCallCheck(this, HyperScroller);
 
     _this = _super.call(this, args, parent);
-    _this.template = require('./hyper-scroller');
+    _this.template = "<div class = \"cv-hyperscroller\" cv-ref  = \"list\">\n\t<div class = \"cv-hyperscroller-row\" cv-ref = \"row\" cv-bind = \"row\"></div>\n</div>\n";
 
     _this.preRuleSet.add('[cv-ref="list"]', function (_ref) {
       var element = _ref.element;
       element.setAttribute('tabindex', -1);
       element.setAttribute('cv-each', 'visible:row:r');
-      element.setAttribute('cv-view', './Row');
+      element.setAttribute('cv-view', 'cv2-hyperscroll/Row');
     });
 
     _this.args.visible = [];
