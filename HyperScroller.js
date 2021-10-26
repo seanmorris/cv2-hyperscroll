@@ -290,11 +290,9 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
         duration = 512;
       }
 
-      var snapper = Math.abs(diff) > Math.min(10, this.args.rowHeight / 3) ? new _ElasticOut.ElasticOut(duration * 3, {
+      var snapper = Math.abs(diff) > Math.min(15, this.args.rowHeight / 3) ? new _ElasticOut.ElasticOut(duration * 3, {
         friction: 0.15
-      }) : new _GeoOut.GeoOut(diff * 3, {
-        power: 5
-      });
+      }) : new Linear(diff);
       this.snapperDone && this.snapperDone();
       this.snapperDone = this.onFrame(function () {
         var offset = snapper.current() * diff;

@@ -256,9 +256,9 @@ export class HyperScroller extends Mixin.from(BaseView)
 			duration = 512;
 		}
 
-		const snapper = Math.abs(diff) > Math.min(10, (this.args.rowHeight/3))
+		const snapper = Math.abs(diff) > Math.min(15, (this.args.rowHeight/3))
 			? new ElasticOut(duration*3, {friction: 0.15})
-			: new GeoOut(diff*3, {power: 5});
+			: new Linear(diff);
 
 		this.snapperDone && this.snapperDone();
 
