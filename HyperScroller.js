@@ -17,6 +17,8 @@ var _GeoIn = require("curvature/animate/ease/GeoIn");
 
 var _GeoOut = require("curvature/animate/ease/GeoOut");
 
+var _Linear = require("curvature/animate/ease/Linear");
+
 var _ElasticOut = require("curvature/animate/ease/ElasticOut");
 
 var _Row = require("./Row");
@@ -292,7 +294,7 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
 
       var snapper = Math.abs(diff) > Math.min(15, this.args.rowHeight / 3) ? new _ElasticOut.ElasticOut(duration * 3, {
         friction: 0.15
-      }) : new Linear(diff);
+      }) : new _Linear.Linear(diff);
       this.snapperDone && this.snapperDone();
       this.snapperDone = this.onFrame(function () {
         var offset = snapper.current() * diff;

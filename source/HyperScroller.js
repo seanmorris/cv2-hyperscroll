@@ -7,6 +7,7 @@ import { Tag } from 'curvature/base/Tag';
 
 import { GeoIn      } from 'curvature/animate/ease/GeoIn';
 import { GeoOut     } from 'curvature/animate/ease/GeoOut';
+import { Linear     } from 'curvature/animate/ease/Linear';
 import { ElasticOut } from 'curvature/animate/ease/ElasticOut';
 
 import { Row } from './Row';
