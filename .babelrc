@@ -8,11 +8,7 @@
 	, "env": {
 		"prod": {}
 		, "prod-min": {
-			presets: [
-				['minify', {
-					"builtIns": false
-				}]
-			]
+			presets: [ ['minify', {"builtIns": false}] ]
 		}
 	}
 }

@@ -1,7 +1,9 @@
 import { rawquire } from 'rawquire/rawquire.macro';
 
-import { View as BaseView } from 'curvature/base/View';
-import { Mixin } from 'curvature/base/Mixin';
+import { Bindable } from 'curvature/base/Bindable';
+
+import { View } from 'curvature/base/View';
+// import { Mixin } from 'curvature/base/Mixin';
 
 import { Tag } from 'curvature/base/Tag';
 
@@ -10,9 +12,10 @@ import { GeoOut     } from 'curvature/animate/ease/GeoOut';
 import { Linear     } from 'curvature/animate/ease/Linear';
 import { ElasticOut } from 'curvature/animate/ease/ElasticOut';
 
-import { Row } from './Row';
+import { RecordSet } from './RecordSet';
+import { Row       } from './Row';
 
-export class HyperScroller extends Mixin.from(BaseView)
+export class HyperScroller extends View
 {
 	constructor(args, parent)
 	{
@@ -32,7 +35,6 @@ export class HyperScroller extends Mixin.from(BaseView)
 		this.first          = null;
 		this.last           = null;
 
-		this.changing       = false;
 		this.lastScroll     = false;
 		this.topSpeed       = 0;
 		this.speed          = 0;
@@ -58,6 +60,8 @@ export class HyperScroller extends Mixin.from(BaseView)
 				this.args.scrollDir = -1;
 			}
 		});
+
+		return Bindable.make(this);
 	}
 
 	onRendered()
@@ -83,7 +87,6 @@ export class HyperScroller extends Mixin.from(BaseView)
 
 		this.listen(scroller.node, 'scroll', event => this.updateViewport(event));
 
-		this.args.bindTo('snapOffset', v => container.style({'--snapperOffset': `${-1*v}px`}), {wait: 0});
 		this.args.bindTo('snapOffset', v => container.style({'--snapperOffset': `${-1*v}px`}), {wait: 0});
 
 		scroller.append(shim.element);
@@ -113,7 +116,12 @@ export class HyperScroller extends Mixin.from(BaseView)
 			this.onNextFrame(() => this.updateViewport());
 		});
 
-		this.contentDebind = this.args.bindTo('content', (v,k,t) => {
+		this.contentDebind = this.args.bindTo('content', (v,k,t,d,p) => {
+
+			if(p)
+			{
+				this.contentDebind();
+			}
 
 			const headers = this.header && this.header();
 
@@ -127,6 +135,28 @@ export class HyperScroller extends Mixin.from(BaseView)
 
 			if(v)
 			{
+				if(v instanceof RecordSet)
+				{
+					this.listen(v, 'recordChanged', event => {
+
+						this.length = event.detail.length;
+
+						console.log(this.container.scrollHeight, this.container.scrollTop + this.container.offsetHeight);
+
+						if(this.container.scrollHeight === this.container.scrollTop + this.container.offsetHeight)
+						{
+							this.onTimeout(0, () => {
+								this.container.scrollTo({top: this.container.scrollHeight});
+							});
+						}
+
+						if(this.first <= event.detail.key && event.detail.key <= this.last)
+						{
+							this.setVisible(this.first, 1 + this.last);
+						}
+					});
+				}
+
 				this.lengthDebind = v.bindTo('length', v => {
 
 					const headers = this.header && this.header();
@@ -137,7 +167,14 @@ export class HyperScroller extends Mixin.from(BaseView)
 
 					this.args.shimHeight = v * this.args.rowHeight;
 
-					if(this.args.changedScroll)
+					if(this.args.changedScroll === 2)
+					{
+						this.container.scrollTo({
+							behavior: 'instant'
+							, top: this.container.scrollHeight,
+						});
+					}
+					else if(this.args.changedScroll)
 					{
 						this.container.scrollTo({
 							behavior: 'smooth'
@@ -158,15 +195,15 @@ export class HyperScroller extends Mixin.from(BaseView)
 		this.container.scrollTo({top:this.container.scrollHeight});
 	}
 
+	handleRecordSetChanged(event)
+	{
+
+	}
+
 	updateViewport(event)
 	{
 		const container = this.container;
 		const scroller  = this.scroller || container;
-
-		if(this.changing)
-		{
-			return;
-		}
 
 		this.snapper && this.snapper.cancel();
 
@@ -302,13 +339,6 @@ export class HyperScroller extends Mixin.from(BaseView)
 
 	setVisible(first, last)
 	{
-		if(this.changing)
-		{
-			// cancelAnimationFrame(this.changing);
-			// this.changing = false;
-			return;
-		}
-
 		if(this.first === first && this.last === last)
 		{
 			return;
@@ -387,8 +417,6 @@ export class HyperScroller extends Mixin.from(BaseView)
 
 		this.first = first;
 		this.last  = last;
-
-		this.changing = false;
 	}
 
 	header()

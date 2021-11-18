@@ -1,1 +1,4 @@
 dist/* -diff
+*.js -diff
+package-lock.json -diff
+./brunch-config.js diff

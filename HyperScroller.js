@@ -7,9 +7,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.HyperScroller = void 0;
 
-var _View = require("curvature/base/View");
+var _Bindable = require("curvature/base/Bindable");
 
-var _Mixin = require("curvature/base/Mixin");
+var _View2 = require("curvature/base/View");
 
 var _Tag = require("curvature/base/Tag");
 
@@ -20,6 +20,8 @@ var _GeoOut = require("curvature/animate/ease/GeoOut");
 var _Linear = require("curvature/animate/ease/Linear");
 
 var _ElasticOut = require("curvature/animate/ease/ElasticOut");
+
+var _RecordSet = require("./RecordSet");
 
 var _Row = require("./Row");
 
@@ -45,8 +47,8 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
-  _inherits(HyperScroller, _Mixin$from);
+var HyperScroller = /*#__PURE__*/function (_View) {
+  _inherits(HyperScroller, _View);
 
   var _super = _createSuper(HyperScroller);
 
@@ -90,7 +92,7 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
       }
     });
 
-    return _this;
+    return _possibleConstructorReturn(_this, _Bindable.Bindable.make(_assertThisInitialized(_this)));
   }
 
   _createClass(HyperScroller, [{
@@ -116,13 +118,6 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
       });
       this.listen(scroller.node, 'scroll', function (event) {
         return _this2.updateViewport(event);
-      });
-      this.args.bindTo('snapOffset', function (v) {
-        return container.style({
-          '--snapperOffset': "".concat(-1 * v, "px")
-        });
-      }, {
-        wait: 0
       });
       this.args.bindTo('snapOffset', function (v) {
         return container.style({
@@ -162,7 +157,11 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
           return _this2.updateViewport();
         });
       });
-      this.contentDebind = this.args.bindTo('content', function (v, k, t) {
+      this.contentDebind = this.args.bindTo('content', function (v, k, t, d, p) {
+        if (p) {
+          _this2.contentDebind();
+        }
+
         var headers = _this2.header && _this2.header();
 
         var headerRow = headers ? 1 : 0;
@@ -171,6 +170,25 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
         _this2.lengthDebind && _this2.lengthDebind();
 
         if (v) {
+          if (v instanceof _RecordSet.RecordSet) {
+            _this2.listen(v, 'recordChanged', function (event) {
+              _this2.length = event.detail.length;
+              console.log(_this2.container.scrollHeight, _this2.container.scrollTop + _this2.container.offsetHeight);
+
+              if (_this2.container.scrollHeight === _this2.container.scrollTop + _this2.container.offsetHeight) {
+                _this2.onTimeout(0, function () {
+                  _this2.container.scrollTo({
+                    top: _this2.container.scrollHeight
+                  });
+                });
+              }
+
+              if (_this2.first <= event.detail.key && event.detail.key <= _this2.last) {
+                _this2.setVisible(_this2.first, 1 + _this2.last);
+              }
+            });
+          }
+
           _this2.lengthDebind = v.bindTo('length', function (v) {
             var headers = _this2.header && _this2.header();
 
@@ -180,7 +198,12 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
 
             _this2.args.shimHeight = v * _this2.args.rowHeight;
 
-            if (_this2.args.changedScroll) {
+            if (_this2.args.changedScroll === 2) {
+              _this2.container.scrollTo({
+                behavior: 'instant',
+                top: _this2.container.scrollHeight
+              });
+            } else if (_this2.args.changedScroll) {
               _this2.container.scrollTo({
                 behavior: 'smooth',
                 top: _this2.container.scrollHeight
@@ -200,6 +223,9 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
         top: this.container.scrollHeight
       });
     }
+  }, {
+    key: "handleRecordSetChanged",
+    value: function handleRecordSetChanged(event) {}
   }, {
     key: "updateViewport",
     value: function updateViewport(event) {
@@ -424,6 +450,6 @@ var HyperScroller = /*#__PURE__*/function (_Mixin$from) {
   }]);
 
   return HyperScroller;
-}(_Mixin.Mixin.from(_View.View));
+}(_View2.View);
 
 exports.HyperScroller = HyperScroller;
