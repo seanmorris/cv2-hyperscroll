@@ -71,7 +71,6 @@ var HyperScroller = /*#__PURE__*/function (_View) {
     _this.args.content = undefined;
     _this.first = null;
     _this.last = null;
-    _this.changing = false;
     _this.lastScroll = false;
     _this.topSpeed = 0;
     _this.speed = 0;
@@ -233,11 +232,6 @@ var HyperScroller = /*#__PURE__*/function (_View) {
 
       var container = this.container;
       var scroller = this.scroller || container;
-
-      if (this.changing) {
-        return;
-      }
-
       this.snapper && this.snapper.cancel();
       var headers = this.header && this.header();
       var start = this.args.scrollTop = scroller.scrollTop;
@@ -350,12 +344,6 @@ var HyperScroller = /*#__PURE__*/function (_View) {
   }, {
     key: "setVisible",
     value: function setVisible(first, last) {
-      if (this.changing) {
-        // cancelAnimationFrame(this.changing);
-        // this.changing = false;
-        return;
-      }
-
       if (this.first === first && this.last === last) {
         return;
       }
@@ -423,7 +411,6 @@ var HyperScroller = /*#__PURE__*/function (_View) {
       ;
       this.first = first;
       this.last = last;
-      this.changing = false;
     }
   }, {
     key: "header",

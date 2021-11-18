@@ -1,34 +1,37 @@
 {
-  "name": "cv2-hyperscroll",
-  "author": "Sean Morris,",
-  "version": "0.0.2-b",
-  "description": "Hyperscroll views for curvature.",
-  "dependencies": {
-    "curvature": "^0.0.66-r"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.13.14",
-    "@babel/core": "^7.13.14",
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/preset-env": "^7.13.12",
-    "auto-reload-brunch": "^2",
-    "babel-brunch": "^7.0.1",
-    "babel-minify": "^0.5.1",
-    "babel-plugin-macros": "^3.1.0",
-    "brunch": "^3",
-    "clean-css-brunch": "^3",
-    "cv3-test": "^0.0.11",
-    "pobot": "^0.0.6",
-    "raw-brunch": "^1.0.2",
-    "rawquire": "^0.0.1",
-    "terser-brunch": "^4",
-    "uglify-es-brunch": "^1"
-  },
-  "files": [
-    "dist/cv2-hyperscroll.min.js",
-    "dist/cv2-hyperscroll.js",
-    "HyperScroller.js",
-    "RecordSet.js",
-    "Row.js"
-  ]
+    "name": "cv2-hyperscroll",
+    "author": "Sean Morris,",
+    "version": "0.0.2-b",
+    "description": "Hyperscroll views for curvature.",
+    "dependencies":
+    {
+        "curvature": "^0.0.66-r"
+    },
+    "devDependencies":
+    {
+        "@babel/cli": "^7.13.14",
+        "@babel/core": "^7.13.14",
+        "@babel/plugin-proposal-class-properties": "^7.13.0",
+        "@babel/preset-env": "^7.13.12",
+        "auto-reload-brunch": "^2",
+        "babel-brunch": "^7.0.1",
+        "babel-minify": "^0.5.1",
+        "babel-plugin-macros": "^3.1.0",
+        "brunch": "^3",
+        "clean-css-brunch": "^3",
+        "cv3-test": "^0.0.11",
+        "pobot": "^0.0.6",
+        "raw-brunch": "^1.0.2",
+        "rawquire": "^0.0.1",
+        "terser-brunch": "^4",
+        "uglify-es-brunch": "^1"
+    },
+    "files":
+    [
+        "dist/cv2-hyperscroll.min.js",
+        "dist/cv2-hyperscroll.js",
+        "HyperScroller.js",
+        "RecordSet.js",
+        "Row.js"
+    ]
 }

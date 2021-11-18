@@ -81,15 +81,13 @@ var RecordSet = /*#__PURE__*/function (_Mixin$with) {
         _this.content.splice(k, 0, v);
       } else {
         _this.content[k] = v;
-      } // if(this.offsets.has(k))
-      // {
-      // 	this.offsets.set(k, 1 + Number(this.offsets.get(k)));
-      // }
-      // else
-      // {
-      // 	this.offsets.set(k, 1);
-      // }
+      }
 
+      if (_this.offsets.has(k)) {
+        _this.offsets.set(k, 1 + Number(_this.offsets.get(k)));
+      } else {
+        _this.offsets.set(k, 1);
+      }
 
       _this.length = 1 + _this.length;
       _this.content[k] = v;
@@ -149,6 +147,11 @@ var RecordSet = /*#__PURE__*/function (_Mixin$with) {
     key: "fetch",
     value: function fetch(k) {
       return undefined;
+    }
+  }, {
+    key: "slice",
+    value: function slice(kFirst, kLast) {
+      return [];
     }
   }]);
 
