@@ -16,6 +16,8 @@ exports.paths = {
   public: 'dist', watched: ['source', 'build']
 };
 
+
 exports.modules = {
 	nameCleaner: path => path.replace(/^(source|build)?\//, 'cv2-hyperscroll/')
 }
+
