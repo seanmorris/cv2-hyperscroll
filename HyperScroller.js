@@ -141,8 +141,8 @@ var HyperScroller = /*#__PURE__*/function (_View) {
           width: v
         });
       });
-      this.args.bindTo('rowHeight', setHeights);
       this.args.bindTo('shimHeight', setHeights);
+      this.args.bindTo('rowHeight', setHeights);
       this.args.bindTo('rowHeight', function (v, k, t) {
         var headers = _this2.header && _this2.header();
 
@@ -156,10 +156,14 @@ var HyperScroller = /*#__PURE__*/function (_View) {
           return _this2.updateViewport();
         });
       });
-      this.contentDebind = this.args.bindTo('content', function (v, k, t, d, p) {
-        if (p) {
-          _this2.contentDebind();
+      this.args.bindTo('content', function (v, k, t, d, p) {
+        _this2.contentDebind && _this2.contentDebind();
+
+        if (!Array.isArray(v)) {
+          return;
         }
+
+        ;
 
         var headers = _this2.header && _this2.header();
 
@@ -171,11 +175,11 @@ var HyperScroller = /*#__PURE__*/function (_View) {
         if (v) {
           if (v instanceof _RecordSet.RecordSet) {
             _this2.listen(v, 'recordChanged', function (event) {
+              console.log(event);
               _this2.length = event.detail.length;
-              console.log(_this2.container.scrollHeight, _this2.container.scrollTop + _this2.container.offsetHeight);
 
               if (_this2.container.scrollHeight === _this2.container.scrollTop + _this2.container.offsetHeight) {
-                _this2.onTimeout(0, function () {
+                _this2.onNextFrame(function () {
                   _this2.container.scrollTo({
                     top: _this2.container.scrollHeight
                   });
@@ -208,12 +212,20 @@ var HyperScroller = /*#__PURE__*/function (_View) {
                 top: _this2.container.scrollHeight
               });
             }
-          }, {
-            wait: 0
           });
         } else {
           _this2.updateViewport();
         }
+
+        _this2.contentDebind = v.bindTo(function (v, k, t, d, p) {
+          k = Number(k);
+
+          if (_this2.first > k || k > _this2.last) {
+            return;
+          }
+
+          _this2.setVisible(_this2.first, _this2.last, true);
+        });
       }, {
         wait: 0
       });
@@ -332,9 +344,7 @@ var HyperScroller = /*#__PURE__*/function (_View) {
         _this3.args.snapOffset = 0;
         _this3.snapperDone && _this3.snapperDone();
         event.preventDefault();
-      })["catch"](function (elapsed) {// const offset = this.snapper.current() * diff;
-        // this.args.snapOffset = 0;
-      });
+      })["catch"](function (elapsed) {});
       this.scrollFrame && cancelAnimationFrame(this.scrollFrame);
       this.scrollFrame = requestAnimationFrame(function () {
         return snapper.start();
@@ -344,7 +354,9 @@ var HyperScroller = /*#__PURE__*/function (_View) {
   }, {
     key: "setVisible",
     value: function setVisible(first, last) {
-      if (this.first === first && this.last === last) {
+      var changed = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      if (!changed && this.first === first && this.last === last) {
         return;
       }
 

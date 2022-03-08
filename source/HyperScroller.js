@@ -94,10 +94,10 @@ export class HyperScroller extends View
 		const setHeights = (v,k) => scroller.style({[`--${k}`]: `${v}px`});
 
 		this.args.bindTo('height', v => container.style({height: v}));
-		this.args.bindTo('width', v => container.style({width: v}));
+		this.args.bindTo('width',  v => container.style({width: v}));
 
-		this.args.bindTo('rowHeight', setHeights);
 		this.args.bindTo('shimHeight', setHeights);
+		this.args.bindTo('rowHeight',  setHeights);
 
 		this.args.bindTo('rowHeight', (v,k,t) => {
 
@@ -116,12 +116,11 @@ export class HyperScroller extends View
 			this.onNextFrame(() => this.updateViewport());
 		});
 
-		this.contentDebind = this.args.bindTo('content', (v,k,t,d,p) => {
+		this.args.bindTo('content', (v,k,t,d,p) => {
 
-			if(p)
-			{
-				this.contentDebind();
-			}
+			this.contentDebind && this.contentDebind();
+
+			if(!Array.isArray(v)) { return };
 
 			const headers = this.header && this.header();
 
@@ -141,11 +140,9 @@ export class HyperScroller extends View
 
 						this.length = event.detail.length;
 
-						console.log(this.container.scrollHeight, this.container.scrollTop + this.container.offsetHeight);
-
 						if(this.container.scrollHeight === this.container.scrollTop + this.container.offsetHeight)
 						{
-							this.onTimeout(0, () => {
+							this.onNextFrame(() => {
 								this.container.scrollTo({top: this.container.scrollHeight});
 							});
 						}
@@ -182,12 +179,22 @@ export class HyperScroller extends View
 						});
 					}
 
-				}, {wait: 0});
+				});
 			}
 			else
 			{
 				this.updateViewport();
 			}
+
+			this.contentDebind = v.bindTo((v,k,t,d,p) => {
+				k = Number(k);
+				if(this.first > k || k > this.last)
+				{
+					return;
+				}
+				this.setVisible(this.first, this.last, true);
+			});
+
 		}, {wait: 0});
 
 		this.updateViewport();
@@ -322,13 +329,7 @@ export class HyperScroller extends View
 
 			event.preventDefault();
 
-		}).catch(elapsed => {
-
-			// const offset = this.snapper.current() * diff;
-
-			// this.args.snapOffset = 0;
-
-		});
+		}).catch(elapsed => {});
 
 		this.scrollFrame && cancelAnimationFrame(this.scrollFrame);
 
@@ -337,9 +338,9 @@ export class HyperScroller extends View
 		this.snapper = snapper;
 	}
 
-	setVisible(first, last)
+	setVisible(first, last, changed = false)
 	{
-		if(this.first === first && this.last === last)
+		if(!changed && this.first === first && this.last === last)
 		{
 			return;
 		}

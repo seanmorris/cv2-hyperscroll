@@ -1,10 +1,10 @@
 {
     "name": "cv2-hyperscroll",
     "author": "Sean Morris,",
-    "version": "0.0.3",
+    "version": "0.0.3-a",
     "description": "Hyperscroll views for curvature.",
     "dependencies": {
-        "curvature": "^0.0.68"
+        "curvature": "^0.0.68-c"
     },
     "devDependencies": {
         "@babel/cli": "^7.13.14",
