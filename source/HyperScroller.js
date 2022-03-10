@@ -119,20 +119,15 @@ export class HyperScroller extends View
 		this.args.bindTo('content', (v,k,t,d,p) => {
 
 			this.contentDebind && this.contentDebind();
+			this.lengthDebind  && this.lengthDebind();
 
-			if(!Array.isArray(v)) { return };
-
-			const headers = this.header && this.header();
-
+			const headers   = this.header && this.header();
 			const headerRow = headers ? 1 : 0;
-
-			const rows = headerRow + v ? v.length : 0;
+			const rows      = headerRow + v ? v.length : 0;
 
 			this.args.shimHeight = rows * this.args.rowHeight;
 
-			this.lengthDebind && this.lengthDebind();
-
-			if(v)
+			if(v || Array.isArray(v))
 			{
 				if(v instanceof RecordSet)
 				{
@@ -180,20 +175,20 @@ export class HyperScroller extends View
 					}
 
 				});
+
+				this.contentDebind = v.bindTo((v,k,t,d,p) => {
+					k = Number(k);
+					if(this.first > k || k > this.last)
+					{
+						return;
+					}
+					this.setVisible(this.first, this.last, true);
+				});
 			}
 			else
 			{
 				this.updateViewport();
 			}
-
-			this.contentDebind = v.bindTo((v,k,t,d,p) => {
-				k = Number(k);
-				if(this.first > k || k > this.last)
-				{
-					return;
-				}
-				this.setVisible(this.first, this.last, true);
-			});
 
 		}, {wait: 0});
 
