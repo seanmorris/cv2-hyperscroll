@@ -169,15 +169,9 @@ var HyperScroller = /*#__PURE__*/function (_View) {
         if (v || Array.isArray(v)) {
           if (v instanceof _RecordSet.RecordSet) {
             _this2.listen(v, 'recordChanged', function (event) {
-              _this2.length = event.detail.length;
+              _this2.scrollToNewBottom();
 
-              if (_this2.container.scrollHeight === _this2.container.scrollTop + _this2.container.offsetHeight) {
-                _this2.onNextFrame(function () {
-                  _this2.container.scrollTo({
-                    top: _this2.container.scrollHeight
-                  });
-                });
-              }
+              _this2.length = event.detail.length;
 
               if (_this2.first <= event.detail.key && event.detail.key <= _this2.last) {
                 _this2.setVisible(_this2.first, 1 + _this2.last);
@@ -192,28 +186,28 @@ var HyperScroller = /*#__PURE__*/function (_View) {
 
             _this2.updateViewport();
 
-            _this2.args.shimHeight = v * _this2.args.rowHeight;
+            _this2.scrollToNewBottom();
 
-            if (_this2.args.changedScroll === 2) {
-              _this2.container.scrollTo({
-                behavior: 'instant',
-                top: _this2.container.scrollHeight
-              });
-            } else if (_this2.args.changedScroll) {
-              _this2.container.scrollTo({
-                behavior: 'smooth',
-                top: _this2.container.scrollHeight
-              });
-            }
+            _this2.args.shimHeight = v * _this2.args.rowHeight;
           });
           _this2.contentDebind = v.bindTo(function (v, k, t, d, p) {
             k = Number(k);
 
-            if (_this2.first > k || k > _this2.last) {
+            _this2.scrollToNewBottom();
+
+            _this2.args.shimHeight = t.length * _this2.args.rowHeight;
+
+            if (_this2.first > k) {
               return;
             }
 
+            if (k > _this2.last) {
+              _this2.setVisible(_this2.first, 1 + _this2.last, true);
+            }
+
             _this2.setVisible(_this2.first, _this2.last, true);
+          }, {
+            wait: 0
           });
         } else {
           _this2.updateViewport();
@@ -221,10 +215,28 @@ var HyperScroller = /*#__PURE__*/function (_View) {
       }, {
         wait: 0
       });
-      this.updateViewport();
-      this.container.scrollTo({
-        top: this.container.scrollHeight
-      });
+      this.updateViewport(); // this.container.scrollTo({top:this.container.scrollHeight});
+    }
+  }, {
+    key: "scrollToNewBottom",
+    value: function scrollToNewBottom() {
+      var _this3 = this;
+
+      if (this.container.scrollHeight === this.container.scrollTop + this.container.offsetHeight) {
+        this.onNextFrame(function () {
+          if (_this3.args.changedScroll === 2) {
+            _this3.container.scrollTo({
+              behavior: 'instant',
+              top: _this3.container.scrollHeight
+            });
+          } else if (_this3.args.changedScroll) {
+            _this3.container.scrollTo({
+              behavior: 'smooth',
+              top: _this3.container.scrollHeight
+            });
+          }
+        });
+      }
     }
   }, {
     key: "handleRecordSetChanged",
@@ -232,7 +244,7 @@ var HyperScroller = /*#__PURE__*/function (_View) {
   }, {
     key: "updateViewport",
     value: function updateViewport(event) {
-      var _this3 = this;
+      var _this4 = this;
 
       var container = this.container;
       var scroller = this.scroller || container;
@@ -257,18 +269,18 @@ var HyperScroller = /*#__PURE__*/function (_View) {
         this.speedTimer = this.onTimeout(100, function () {
           var timeDiff = Date.now() - lastScroll.time;
           var posDiff = scroller.scrollTop - start;
-          _this3.speed = posDiff / timeDiff * 1000;
-          var absSpeed = Math.abs(_this3.speed);
+          _this4.speed = posDiff / timeDiff * 1000;
+          var absSpeed = Math.abs(_this4.speed);
 
-          if (absSpeed > Math.abs(_this3.topSpeed)) {
-            _this3.topSpeed = _this3.speed;
+          if (absSpeed > Math.abs(_this4.topSpeed)) {
+            _this4.topSpeed = _this4.speed;
           }
 
-          if (!_this3.speed) {
-            _this3.topSpeed = _this3.speed;
+          if (!_this4.speed) {
+            _this4.topSpeed = _this4.speed;
           }
 
-          _this3.args.speed = _this3.speed.toFixed(2);
+          _this4.args.speed = _this4.speed.toFixed(2);
         });
         this.speedTimer = false;
       }
@@ -322,10 +334,10 @@ var HyperScroller = /*#__PURE__*/function (_View) {
       this.snapperDone && this.snapperDone();
       this.snapperDone = this.onFrame(function () {
         var offset = snapper.current() * diff;
-        _this3.args.snapOffset = offset;
+        _this4.args.snapOffset = offset;
       });
       snapper.then(function (elapsed) {
-        if (_this3.args.snapOffset == 0) {
+        if (_this4.args.snapOffset == 0) {
           return;
         }
 
@@ -333,8 +345,8 @@ var HyperScroller = /*#__PURE__*/function (_View) {
           scroller.scrollTop = groove;
         }
 
-        _this3.args.snapOffset = 0;
-        _this3.snapperDone && _this3.snapperDone();
+        _this4.args.snapOffset = 0;
+        _this4.snapperDone && _this4.snapperDone();
         event.preventDefault();
       })["catch"](function (elapsed) {});
       this.scrollFrame && cancelAnimationFrame(this.scrollFrame);
@@ -424,6 +436,10 @@ var HyperScroller = /*#__PURE__*/function (_View) {
       }
 
       if (Array.isArray(this.args.content)) {
+        if (this.args.header) {
+          return this.args.content[0];
+        }
+
         return false;
       }
 

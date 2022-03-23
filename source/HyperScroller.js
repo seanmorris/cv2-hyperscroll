@@ -133,14 +133,9 @@ export class HyperScroller extends View
 				{
 					this.listen(v, 'recordChanged', event => {
 
-						this.length = event.detail.length;
+						this.scrollToNewBottom();
 
-						if(this.container.scrollHeight === this.container.scrollTop + this.container.offsetHeight)
-						{
-							this.onNextFrame(() => {
-								this.container.scrollTo({top: this.container.scrollHeight});
-							});
-						}
+						this.length = event.detail.length;
 
 						if(this.first <= event.detail.key && event.detail.key <= this.last)
 						{
@@ -157,33 +152,31 @@ export class HyperScroller extends View
 
 					this.updateViewport();
 
+					this.scrollToNewBottom();
+
 					this.args.shimHeight = v * this.args.rowHeight;
-
-					if(this.args.changedScroll === 2)
-					{
-						this.container.scrollTo({
-							behavior: 'instant'
-							, top: this.container.scrollHeight,
-						});
-					}
-					else if(this.args.changedScroll)
-					{
-						this.container.scrollTo({
-							behavior: 'smooth'
-							, top: this.container.scrollHeight,
-						});
-					}
-
 				});
 
 				this.contentDebind = v.bindTo((v,k,t,d,p) => {
 					k = Number(k);
-					if(this.first > k || k > this.last)
+
+					this.scrollToNewBottom();
+
+					this.args.shimHeight = t.length * this.args.rowHeight;
+
+					if(this.first > k)
 					{
 						return;
 					}
+
+					if(k > this.last)
+					{
+						this.setVisible(this.first, 1 + this.last, true);
+					}
+
 					this.setVisible(this.first, this.last, true);
-				});
+
+				}, {wait:0});
 			}
 			else
 			{
@@ -194,7 +187,30 @@ export class HyperScroller extends View
 
 		this.updateViewport();
 
-		this.container.scrollTo({top:this.container.scrollHeight});
+		// this.container.scrollTo({top:this.container.scrollHeight});
+	}
+
+	scrollToNewBottom()
+	{
+		if(this.container.scrollHeight === this.container.scrollTop + this.container.offsetHeight)
+		{
+			this.onNextFrame(() => {
+				if(this.args.changedScroll === 2)
+				{
+					this.container.scrollTo({
+						behavior: 'instant'
+						, top: this.container.scrollHeight,
+					});
+				}
+				else if(this.args.changedScroll)
+				{
+					this.container.scrollTo({
+						behavior: 'smooth'
+						, top: this.container.scrollHeight,
+					});
+				}
+			});
+		}
 	}
 
 	handleRecordSetChanged(event)
@@ -424,6 +440,11 @@ export class HyperScroller extends View
 
 		if(Array.isArray(this.args.content))
 		{
+			if(this.args.header)
+			{
+				return this.args.content[0];
+			}
+
 			return false;
 		}
 
